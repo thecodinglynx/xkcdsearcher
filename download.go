@@ -7,15 +7,19 @@ import (
 	"net/http"
 )
 
-const XkcdUrl = "https://xkcd.com/571/info.0.json"
+const FirstComic = 1
+const LastComic = 2661 // as of August 21st
+const XkcdUrl = "https://xkcd.com/%d/info.0.json"
 
 type Info struct {
-	Title string
-	Alt   string
+	Num              int
+	Title            string
+	Alt              string
+	Year, Month, Day string
 }
 
-func getXkcd() {
-	resp, err := http.Get(XkcdUrl)
+func getXkcd(nr int) Info {
+	resp, err := http.Get(fmt.Sprintf(XkcdUrl, nr))
 	if err != nil {
 		log.Fatalf("Unable to retrieve XKCD description from %s: %s", XkcdUrl, err)
 	}
@@ -27,5 +31,5 @@ func getXkcd() {
 		log.Fatalf("Unable to parse response to Info struct: %s", err)
 	}
 	resp.Body.Close()
-	fmt.Printf("%-20s %s\n", info.Title, info.Alt)
+	return info
 }
