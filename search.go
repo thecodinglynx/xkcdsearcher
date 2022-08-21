@@ -8,12 +8,12 @@ import (
 )
 
 func main() {
-	nr := flag.Int("n", -1, "Get the XKCD comic with this number")
+	nr := flag.Int("n", 0, "Get the XKCD comic with this number")
 	random := flag.Bool("r", false, "Get a random XKCD comic")
 	flag.Parse()
 	var comics []Info
 	if *nr > 0 {
-		comics = append(comics, getXkcd(*nr))
+		comics = append(comics, getNr(*nr))
 	}
 	if *random {
 		comics = append(comics, findRandom())
@@ -26,5 +26,6 @@ func main() {
 
 func findRandom() Info {
 	rand.Seed(time.Now().UnixNano())
-	return getXkcd(rand.Intn(LastComic-FirstComic) + FirstComic)
+	latest := getLatestNr().Num
+	return getNr(rand.Intn(latest-FirstComic) + FirstComic)
 }

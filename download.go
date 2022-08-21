@@ -8,8 +8,8 @@ import (
 )
 
 const FirstComic = 1
-const LastComic = 2661 // as of August 21st
 const XkcdUrl = "https://xkcd.com/%d/info.0.json"
+const XkcdUrlLatest = "https://xkcd.com/info.0.json"
 
 type Info struct {
 	Num              int
@@ -18,8 +18,16 @@ type Info struct {
 	Year, Month, Day string
 }
 
-func getXkcd(nr int) Info {
-	resp, err := http.Get(fmt.Sprintf(XkcdUrl, nr))
+func getNr(nr int) Info {
+	return getXkcd(fmt.Sprintf(XkcdUrl, nr))
+}
+
+func getLatestNr() Info {
+	return getXkcd(XkcdUrlLatest)
+}
+
+func getXkcd(url string) Info {
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Unable to retrieve XKCD description from %s: %s", XkcdUrl, err)
 	}
