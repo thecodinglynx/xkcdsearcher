@@ -25,36 +25,36 @@ type Info struct {
 	Year, Month, Day string
 }
 
-func getAll() AllComics {
+func getAllFromLocal() (AllComics, error) {
 	var allComics AllComics
 	jsonFile, err := os.Open(localFile)
 	if err != nil {
-		fmt.Printf("Unable to read local file %s - loading comics from web\n", localFile)
-		allComics = getAllFromWeb()
-		data, err := json.Marshal(allComics)
-		if err != nil {
-			log.Fatalf("JSON marshaling failed: %s", err)
-		}
-		if ioutil.WriteFile(localFile, data, os.ModePerm) != nil {
-			log.Fatalf("Unable to write to file %s: %s", localFile, err)
-		}
-		return allComics
+		return allComics, err
 	}
-	fmt.Printf("Reading comics from file %s\n", localFile)
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &allComics)
 	jsonFile.Close()
 
-	return allComics
+	return allComics, nil
 }
 
-func getAllFromWeb() AllComics {
+func getFromWeb(nrs []int) AllComics {
 	var all AllComics
-	for i := FirstComic; i < 5; i++ {
+	for i := FirstComic; i < len(nrs); i++ {
 		all.Comics = append(all.Comics, getNr(i))
 	}
 	return all
+}
+
+func writeToLocal(allComics AllComics) {
+	data, err := json.Marshal(allComics)
+	if err != nil {
+		log.Fatalf("JSON marshaling failed: %s", err)
+	}
+	if ioutil.WriteFile(localFile, data, os.ModePerm) != nil {
+		log.Fatalf("Unable to write to file %s: %s", localFile, err)
+	}
 }
 
 func getNr(nr int) Info {
