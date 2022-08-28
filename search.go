@@ -23,7 +23,7 @@ func main() {
 	}
 	if len(comics) > 0 {
 		fmt.Printf("%-5s\t%-40s\n", "Nr", "Title & Alternative Text")
-		for _, comic := range comics[:10] {
+		for _, comic := range comics {
 			fmt.Printf("%-5d\t%-40s\n\t%s\n\n", comic.Num, comic.Title, comic.Alt)
 		}
 	}
@@ -53,15 +53,15 @@ func updateLocalFile() []Info {
 	}
 	missing := findMissing(haveLocal)
 	if len(missing) <= 0 {
-		fmt.Printf("Local file already up to date, no need to update.\n\n")
+		fmt.Printf("All currently available Comics (%d) cached locally already, no need to update.\n\n", latestComicId)
 		return allLocal.Comics
 	}
 	fmt.Printf("Latest available comic:\t\t%d\n", latestComicId)
 	fmt.Printf("Latest locally stored comic:\t%d\n", latestLocalComicId)
-	fmt.Printf("Downloading %d missing comics from web\n\n", len(missing))
 	allWeb := getFromWeb(missing)
 	combinedComics := append(allLocal.Comics, allWeb.Comics...)
 	writeToLocal(AllComics{combinedComics})
+	fmt.Printf("Successfully downloaded %d missing comics from web and updated local cache\n\n", len(missing))
 	return combinedComics
 }
 

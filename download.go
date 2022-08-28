@@ -34,9 +34,20 @@ func getAllFromLocal() (AllComics, error) {
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &allComics)
-	jsonFile.Close()
 
 	return allComics, nil
+}
+
+func getFromLocal(nr int) (Info, error) {
+	var info Info
+	allComics, err := getAllFromLocal()
+	if err != nil {
+		return info, err
+	}
+	if c := allComics.Comics; len(c) > nr && c[nr-1] != (Info{}) {
+		return c[nr-1], nil
+	}
+	return info, nil
 }
 
 func getFromWeb(nrs []int) AllComics {
@@ -59,7 +70,14 @@ func writeToLocal(comics AllComics) {
 	}
 }
 
+// first attempts to retrieve the comic info from local storage, otherwise
+// retrieves it from web
 func getNr(nr int) Info {
+	if local, err := getFromLocal(nr); err == nil && local != (Info{}) {
+		fmt.Printf("Returning %d from local storage\n\n", nr)
+		return local
+	}
+	fmt.Printf("Returning %d from web\n\n", nr)
 	return getXkcd(fmt.Sprintf(XkcdUrl, nr))
 }
 

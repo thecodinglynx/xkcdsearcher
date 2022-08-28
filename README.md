@@ -7,20 +7,36 @@ To see the program's help menu:
 go run . -h
 ```
 
-To get the description of a particular XKCD (by number):
+Sync the descriptions of *all* available XKCD comics from the web and store them locally:
+```bash
+go run . -u
+```
+
+To get the description of a particular XKCD by number (tries to retrieve from local storage first):
 ```bash
 go run . -n 523
 ```
 
-To get a random XKCD:
+To get a random XKCD (tries to retrieve from local storage first):
 ```bash
 go run . -r
 ```
 
-## Example
+## Examples
 ```bash
 go run . -r
 
-Nr    Title               Alternative Text
-663   Sagan-Man           They laugh now, but within 10 years the city's entire criminal class will have quit to work on space research.
+Returning 1433 from local storage
+
+Nr      Title & Alternative Text
+1433    Lightsaber
+        A long time in the future, in a galaxy far, far, away, astronomers in the year 2008 sight an unusual gamma-ray burst originating from somewhere far across the universe.
+```
+
+```bash
+go run . -u
+
+Latest available comic:         2664
+Latest locally stored comic:    2661
+Successfully downloaded 3 missing comics from web and updated local cache
 ```
