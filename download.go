@@ -41,14 +41,16 @@ func getAllFromLocal() (AllComics, error) {
 
 func getFromWeb(nrs []int) AllComics {
 	var all AllComics
-	for i := FirstComic; i < len(nrs); i++ {
-		all.Comics = append(all.Comics, getNr(i))
+	for i := range nrs {
+		if info := getNr(nrs[i]); info != (Info{}) {
+			all.Comics = append(all.Comics, info)
+		}
 	}
 	return all
 }
 
-func writeToLocal(allComics AllComics) {
-	data, err := json.Marshal(allComics)
+func writeToLocal(comics AllComics) {
+	data, err := json.MarshalIndent(comics, "", "    ")
 	if err != nil {
 		log.Fatalf("JSON marshaling failed: %s", err)
 	}
@@ -65,15 +67,17 @@ func getLatestNr() Info {
 	return getXkcd(XkcdUrlLatest)
 }
 
+// TODO: make this run concurrently
 func getXkcd(url string) Info {
+	var info Info
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Unable to retrieve XKCD description from %s: %s", XkcdUrl, err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Non-OK status code returned: %v", resp.StatusCode)
+		fmt.Printf("Non-OK status code returned for url %s: %v - skipping\n", url, resp.StatusCode)
+		return info
 	}
-	var info Info
 	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		log.Fatalf("Unable to parse response to Info struct: %s", err)
 	}
