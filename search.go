@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -11,6 +13,7 @@ func main() {
 	nr := flag.Int("n", 0, "Get the XKCD comic with this number")
 	random := flag.Bool("r", false, "Get a random XKCD comic")
 	updateLocal := flag.Bool("u", false, "Update locally stored XKCD comic descriptions")
+	searchTerm := flag.String("s", "", "Searches all locally available XKCD comics for the provided term")
 	flag.Parse()
 	var comics []Info
 	switch {
@@ -20,13 +23,32 @@ func main() {
 		comics = append(comics, findRandom())
 	case *updateLocal:
 		updateLocalFile()
+	case *searchTerm != "":
+		comics = append(comics, search(*searchTerm)...)
 	}
+
 	if len(comics) > 0 {
 		fmt.Printf("%-5s\t%-40s\n", "Nr", "Title & Alternative Text")
 		for _, comic := range comics {
-			fmt.Printf("%-5d\t%-40s\n\t%s\n\n", comic.Num, comic.Title, comic.Alt)
+			fmt.Printf("%-5d\t%-40s\n\t%s\n\t%s\n\n", comic.Num, comic.Title, comic.Alt, comic.Url)
 		}
 	}
+}
+
+func search(term string) []Info {
+	var info []Info
+	all, err := getAllFromLocal()
+	if err != nil {
+		log.Fatalf("Unable to retrieve comics from local storage: %s", err)
+	}
+
+	for _, comic := range all.Comics {
+		s := strings.ToLower(comic.Title + comic.Alt + comic.Transcript)
+		if strings.Contains(s, strings.ToLower(term)) {
+			info = append(info, comic)
+		}
+	}
+	return info
 }
 
 func findRandom() Info {
