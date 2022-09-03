@@ -21,22 +21,11 @@ func getFromWeb(nrs []int) AllComics {
 	return all
 }
 
-// first attempts to retrieve the comic info from local storage, otherwise
-// retrieves it from web
-func getNr(nr int) Info {
-	if local, err := getFromLocal(nr); err == nil && local != (Info{}) {
-		fmt.Printf("Returning %d from local storage\n", nr)
-		return local
-	}
-	fmt.Printf("Returning %d from web\n", nr)
-	return getXkcd(fmt.Sprintf(XkcdUrl, nr))
-}
-
 func getLatestNr() Info {
 	return getXkcd(XkcdUrlLatest)
 }
 
-// TODO: make this run concurrently
+// TODO : make this run concurrently
 func getXkcd(url string) Info {
 	var info Info
 	resp, err := http.Get(url)

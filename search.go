@@ -35,6 +35,18 @@ func main() {
 	}
 }
 
+// first attempts to retrieve the comic info from local storage, otherwise
+// retrieves it from web
+func getNr(nr int) Info {
+	if local, err := getFromLocal(nr); err == nil && local != (Info{}) {
+		fmt.Printf("Returning %d from local storage\n", nr)
+		return local
+	}
+	fmt.Printf("Returning %d from web\n", nr)
+	return getXkcd(fmt.Sprintf(XkcdUrl, nr))
+}
+
+// find and return locally stored XKCD comics that contain the provided search term
 func search(term string) []Info {
 	var info []Info
 	all, err := getAllFromLocal()
