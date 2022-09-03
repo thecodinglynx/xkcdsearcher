@@ -42,6 +42,7 @@ go run . -s "bobby tables"
 Nr      Title & Alternative Text
 327     Exploits of a Mom
         Her daughter is named Help I'm trapped in a driver's license factory.
+        https://imgs.xkcd.com/comics/exploits_of_a_mom.png
 ```
 
 ```bash
@@ -52,4 +53,5 @@ Returning 1433 from local storage
 Nr      Title & Alternative Text
 1433    Lightsaber
         A long time in the future, in a galaxy far, far, away, astronomers in the year 2008 sight an unusual gamma-ray burst originating from somewhere far across the universe.
+        https://imgs.xkcd.com/comics/lightsaber.png
 ```
