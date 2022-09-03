@@ -41,8 +41,10 @@ func getFromLocal(nr int) (Info, error) {
 	if err != nil {
 		return info, err
 	}
-	if c := allComics.Comics; len(c) > nr && c[nr-1] != (Info{}) {
-		return c[nr-1], nil
+	for _, info := range allComics.Comics {
+		if info.Num == nr {
+			return info, nil
+		}
 	}
 	return info, nil
 }
