@@ -23,6 +23,16 @@ type Info struct {
 	Year, Month, Day string
 }
 
+func (comics AllComics) writeToLocal() {
+	data, err := json.MarshalIndent(comics, "", "    ")
+	if err != nil {
+		log.Fatalf("JSON marshaling failed: %s", err)
+	}
+	if ioutil.WriteFile(localFile, data, os.ModePerm) != nil {
+		log.Fatalf("Unable to write to file %s: %s", localFile, err)
+	}
+}
+
 func getAllFromLocal() (AllComics, error) {
 	var allComics AllComics
 	jsonFile, err := os.Open(localFile)
@@ -50,17 +60,7 @@ func getFromLocal(nr int) (Info, error) {
 	return info, nil
 }
 
-func writeToLocal(comics AllComics) {
-	data, err := json.MarshalIndent(comics, "", "    ")
-	if err != nil {
-		log.Fatalf("JSON marshaling failed: %s", err)
-	}
-	if ioutil.WriteFile(localFile, data, os.ModePerm) != nil {
-		log.Fatalf("Unable to write to file %s: %s", localFile, err)
-	}
-}
-
-func updateLocalFile() []Info {
+func updateLocalFile() {
 	latestComicId := getLatestNr().Num
 	allLocal, _ := getAllFromLocal()
 	var latestLocalComicId int
@@ -79,15 +79,13 @@ func updateLocalFile() []Info {
 	missing := findMissing(haveLocal)
 	if len(missing) <= 0 {
 		fmt.Printf("All currently available Comics (%d) cached locally already, no need to update.\n\n", latestComicId)
-		return allLocal.Comics
 	}
 	fmt.Printf("Latest available comic:\t\t%d\n", latestComicId)
 	fmt.Printf("Latest locally stored comic:\t%d\n", latestLocalComicId)
 	allWeb := getFromWeb(missing)
-	combinedComics := append(allLocal.Comics, allWeb.Comics...)
-	writeToLocal(AllComics{combinedComics})
+	comics := AllComics{append(allLocal.Comics, allWeb.Comics...)}
+	comics.writeToLocal()
 	fmt.Printf("Successfully downloaded %d missing comics from web and updated local cache\n\n", len(missing))
-	return combinedComics
 }
 
 func findMissing(haveLocal []bool) []int {
